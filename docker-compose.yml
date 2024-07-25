@@ -30,8 +30,6 @@ services:
         networks:
             - default
 volumes:
-    pgadmin_data:
-        driver: 'local'
     pg_data:
         driver: 'local'
 networks:

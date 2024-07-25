@@ -1,4 +1,4 @@
-# Express Ts E-Commerce
+    # Express Ts E-Commerce
 
 ![ExpressTs](asset/1_edC2tnPxvj-qPw815f8HTw.png)
 
@@ -12,7 +12,7 @@
 _Note_: You will need DB running locally on your machine.
 
 1. Clone this repository
-2. Run `yarn`
-3. Run `nodemon`
-4. Server will connect to MongoDB & run on Port 3031.
+2. Run `yarn install`
+3. Run `yarn start`
+4. Server will connect to PosgrestDB & run on Port 3031.
 
