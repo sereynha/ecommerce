@@ -1,6 +1,11 @@
-import {app} from "./app";
+import {app} from './app';
+import {PORT} from "./utils/secret";
+import {PrismaClient} from '@prisma/client'
 
-const port = process.env.PORT || 3000;
 const appRun = app();
+export const prismaClient = new PrismaClient({
+    log: ['query']
+})
 
-appRun.listen(port,() => {console.log(`Server is running on port ${port} !`)})
+
+appRun.listen(PORT,() => {console.log(`Server is running on port ${PORT} !`)})
