@@ -4,10 +4,10 @@ import {ErrorCode} from "../expections/root";
 import  * as jwt from  'jsonwebtoken'
 import {JWT_SECRET_KEY} from "../utils/secret";
 import {prismaClient} from "../index";
+import JwtPayloads from "../types";
 
 const authMiddleware = async  (req: Request, res: Response, next: NextFunction) => {
   // extract token from header
-//  const token = req.headers.authorization;
   const token = req.headers.authorization?.split(' ')[1];
   // exception token
   if(!token) {
@@ -15,7 +15,7 @@ const authMiddleware = async  (req: Request, res: Response, next: NextFunction) 
   }
   try{
      // verify that token and extract the playload
-     const decoded = jwt.verify(token, JWT_SECRET_KEY) as { userId: number };
+     const decoded = jwt.verify(token, JWT_SECRET_KEY) as JwtPayloads;
      // get the user from playload
      const user = await prismaClient.user.findFirst({
         where: {id: decoded.userId}
@@ -27,7 +27,10 @@ const authMiddleware = async  (req: Request, res: Response, next: NextFunction) 
      req.user = user;
      next();
   } catch (error) {
-     next(new UnauthorizedException('Unauthorized', ErrorCode.UNAUTHORIZED))
+      if (error instanceof jwt.JsonWebTokenError) {
+          return next(new UnauthorizedException('Unauthorized', ErrorCode.UNAUTHORIZED));
+      }
+      next(error);
   }
 };
 
