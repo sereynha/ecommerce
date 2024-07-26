@@ -15,6 +15,6 @@ export  enum  ErrorCode{
     NOT_FOUND = 404,
     ALLREADY_EXISTS = 403,
     UNAUTHORIZED = 401,
-    Unprocessable = 422,
+    UNPROCESSABLE  = 422,
     INTERNAL_EXCEPTION = 500,
 }

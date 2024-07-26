@@ -27,5 +27,48 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
-  @@map("user")
+  addresses Address[]
+
+  @@map("users")
+}
+
+model Address {
+  id Int @id @default(autoincrement())
+  line String
+  city String
+  country String
+  pincode String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId Int
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("addresses")
+}
+
+model Category {
+  id Int @id @default(autoincrement())
+  name String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  products   Product[]
+
+  @@map("categorys")
+}
+
+model Product {
+  id Int @id @default(autoincrement())
+  name String
+  description String @db.Text
+  stock Int @default(0)
+  price Decimal
+  tags String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  categoryId  Int
+  category    Category @relation(fields: [categoryId], references: [id])
+
+  @@map("products")
 }
