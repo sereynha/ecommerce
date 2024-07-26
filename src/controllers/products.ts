@@ -71,7 +71,6 @@ export const getListProduct = async (req:Request, res:Response) => {
 export const getProductByCategories = async (req:Request, res:Response) => {
     try {
         const categoryId = +req.params.id;
-        console.log(categoryId)
         const products = await prismaClient.product.findMany({
             where: {
               categoryId: categoryId,

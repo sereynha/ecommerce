@@ -1,6 +1,6 @@
     # Express Ts E-Commerce
 
-![ExpressTs](asset/1_edC2tnPxvj-qPw815f8HTw.png)
+![ExpressTs](asset/logo.png)
 
 ## Features
 

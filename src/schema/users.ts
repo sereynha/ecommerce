@@ -10,6 +10,12 @@ export const LoginSchema = z.object({
     password: z.string().min(8, { message: 'Password must be at least 8 characters long' })
 })
 
+export const UpdateUserSchema =  z.object({
+    name: z.string().optional(),
+    defaultShippingAddress: z.number().optional(),
+    defaultBillingAddress: z.number().optional()
+})
+
 export const CreateAddressSchema = z.object({
     line: z.string(),
     city: z.string().nonempty({ message: "City is required" }),
