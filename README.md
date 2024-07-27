@@ -6,6 +6,16 @@
 
 - Examples of `GET`, `POST`, `PUT`, `PATCH`, and `DELETE` requests.
 - Modular routers & organized endpoints. See `src/routes`.
+- Request Validation using [`Zod`](https://github.com/colinhacks/zod).
+- Custom middleware implementation
+
+- Connecting to PostgreDB using [Prisma](https://github.com/prisma/prisma.git)
+- Authentication using [JWT](https://jwt.io/)
+- Swagger UI [Swagger-Express](https://github.com/scottie1984/swagger-ui-express) and Swagger Jsdoc [Swagger-Jsdoc](https://github.com/Surnet/swagger-jsdoc)
+- Automatic Restart using [nodemon](https://github.com/remy/nodemon)
+- Hashing Passwords using [bcrypt](https://www.npmjs.com/package/bcrypt).
+- Unit Testing examples using [Jest](https://jestjs.io/). See `src/__tests__`.
+
 
 ## Installation
 

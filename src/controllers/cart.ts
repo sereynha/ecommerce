@@ -1,7 +1,7 @@
 import { NextFunction , Request , Response} from "express";
 import { ErrorCode } from "../expections/root";
 import { NotFoundException } from "../expections/not-found";
-import { Product } from '@prisma/client';
+import { Product,CartItem } from '@prisma/client';
 import {prismaClient} from "../index";
 
 export const createItemToCart = async (req:Request, res:Response) => {
@@ -16,6 +16,20 @@ export const createItemToCart = async (req:Request, res:Response) => {
     } catch(error) {
          throw  new  NotFoundException('Product not found!', ErrorCode.NOT_FOUND)
     }
+    if(product.stock < validated.quantity){
+        throw  new  NotFoundException('Product Sock is not found!', ErrorCode.NOT_FOUND)
+    }
+    if(product.stock >= validated.quantity){
+        product.stock = product.stock - validated.quantity;
+    }
+    await prismaClient.product.update({
+        where: {
+            id: product.id
+        },
+        data: {
+            stock: product.stock
+        }
+    })
     await prismaClient.cartItem.create({
         data: {
             userId: req.user.id,
@@ -44,37 +58,85 @@ export const getItemCart = async (req:Request, res:Response) => {
 }
 
 export const updateQuanlityToCart = async (req:Request, res:Response) => {
+    let product: Product;
+    let item: CartItem;
+    let cartQuantity: number = 0;
     try {
-        const validated = req.body;
-        await prismaClient.cartItem.update({
+         item = await prismaClient.cartItem.findFirstOrThrow({
             where: {
                 id: +req.params.id
-            },
-            data: {
-                quantity: validated.quantity
             }
         })
-        res.status(201).json({
-            message: 'Update successful',
-            success: true
-        });
     } catch (error) {
         throw  new  NotFoundException('Item Cart not found!', ErrorCode.NOT_FOUND)
     }
+    product = await prismaClient.product.findFirstOrThrow({
+        where: {
+            id: item.productId
+        }
+    })
+    cartQuantity = req.body.quantity - item.quantity;
+    if(product.stock < cartQuantity){
+        throw  new  NotFoundException('Product Sock is not found!', ErrorCode.NOT_FOUND)
+    }
+    if(product.stock >= req.body.quantity){
+         product.stock = product.stock - cartQuantity;
+    }
+    await prismaClient.product.update({
+        where: {
+            id: item.productId
+        },
+        data: {
+            stock:  product.stock
+        }
+    });
+    await prismaClient.cartItem.update({
+        where: {
+            id: +item.id
+        },
+        data: {
+            quantity: req.body.quantity
+        }
+    });
+    res.status(201).json({
+        message: 'Update successful',
+        success: true
+    });
 }
 
 export const deleteItemFromCart = async (req:Request, res:Response) => {
+    let item: CartItem;
+    let product: Product;
     try {
-        await prismaClient.cartItem.delete({
+         item = await prismaClient.cartItem.findFirstOrThrow({
             where: {
                 id: +req.params.id
             }
         })
-        res.status(201).json({
-            message: 'Delete successful',
-            success: true
-        });
     } catch (error) {
         throw  new  NotFoundException('Item Cart not found!', ErrorCode.NOT_FOUND)
     }
+    product = await prismaClient.product.findFirstOrThrow({
+        where: {
+            id: item.productId
+        }
+    })
+    product.stock = product.stock + item.quantity;
+    await prismaClient.product.update({
+        where: {
+            id: item.productId
+        },
+        data: {
+            stock:  product.stock
+        }
+    });
+    await prismaClient.cartItem.delete({
+        where: {
+            id: +item.id
+        }
+    })
+    res.status(201).json({
+        message: 'Delete successful',
+        success: true
+    });
 }

@@ -24,7 +24,7 @@ export  const signup = async  (req: Request,res: Response) => {
     });
     res.status(201).json({
         message: 'Create successful',
-        userId: user.id,
+        success: true
     });
 }
 

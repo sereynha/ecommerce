@@ -74,7 +74,7 @@ model Product {
   id Int @id @default(autoincrement())
   name String
   description String @db.Text
-  stock Int? @default(0)
+  stock Int @default(0)
   price Decimal
   tags String
   categoryId  Int
@@ -123,6 +123,7 @@ model Order {
   amount Decimal
   address String?
   phone  String?
+  status OrderEventStatus @default(PENDING)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

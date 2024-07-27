@@ -3,3 +3,5 @@ node_modules
 /pg_data
 pg_data
 .env
+.idea/
+.DS_Store
