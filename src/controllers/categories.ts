@@ -41,6 +41,9 @@ export const getOneCategories = async ( req: Request, res: Response) => {
         const categorie = await prismaClient.category.findFirstOrThrow({
             where: {
                 id: +req.params.id
+            },
+            include: {
+                products: true
             }
         })
         res.status(200).json({

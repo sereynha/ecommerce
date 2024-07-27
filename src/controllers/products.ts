@@ -3,7 +3,6 @@ import {prismaClient} from "../index";
 import {NotFoundException} from "../expections/not-found";
 import {ErrorCode} from "../expections/root";
 
-
 export const createProduct = async (req:Request, res:Response) => {
     const product = await prismaClient.product.create({
         data: {

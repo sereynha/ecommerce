@@ -1,5 +1,5 @@
 import { z } from "zod";
 
-export const CreateCategories = z.object({
+export const CreateCategoriesShema = z.object({
     name: z.string()
 })
