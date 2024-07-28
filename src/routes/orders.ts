@@ -1,14 +1,26 @@
 import { Router } from "express";
 import authMiddleware from "../middlewares/auth";
-import {errorHandler, errorHandlerRetrun} from "../middlewares/error-handler";
-import {cancelOrder, createOrder, getListOrders, getOneOrderById} from "../controllers/orders";
+import {errorHandler} from "../middlewares/error-handler";
+import {
+    cancelOrder,
+    createOrder,
+    getListAllOrdersByStatus,
+    getListOrders,
+    getListUserOrders,
+    getOneOrderById,
+    updateStatus
+} from "../controllers/orders";
+import adminMiddleware from "../middlewares/admin";
 
 const ordersRoutes: Router = Router();
 
 ordersRoutes.post('/', [authMiddleware], errorHandler({method: createOrder}))
 ordersRoutes.get('/', [authMiddleware], errorHandler({method: getListOrders}))
 ordersRoutes.get('/:id', [authMiddleware], errorHandler({method: getOneOrderById}))
+ordersRoutes.get('/status/index', [authMiddleware, adminMiddleware], errorHandler({method: getListAllOrdersByStatus}))
+ordersRoutes.get('/users/:id', [authMiddleware, adminMiddleware], errorHandler({method: getListUserOrders}))
 ordersRoutes.patch('/:id/cancel', [authMiddleware], errorHandler({method: cancelOrder}))
+ordersRoutes.patch('/:id/status', [authMiddleware, adminMiddleware], errorHandler({method: updateStatus}))
 
 export  default  ordersRoutes;
 
@@ -61,7 +73,7 @@ export  default  ordersRoutes;
  *                   type: string
  *                   example: "Please update your address!"
  */
-
+// Get List Orders
 /**
  * @swagger
  * /orders:
@@ -81,7 +93,7 @@ export  default  ordersRoutes;
  *                   items:
  *                     $ref: '#/components/schemas/Order'
  */
-
+// Get Orders By ID
 /**
  * @swagger
  * /orders/{id}:
@@ -108,7 +120,123 @@ export  default  ordersRoutes;
  *       404:
  *         description: Order not found
  */
+// Get List Orders By Status
+/**
+ * @swagger
+ * /orders/status/index:
+ *   get:
+ *     summary: Get list of all orders
+ *     tags: [Orders]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 5
+ *         description: Number of orders to return per page
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           default: "PENDING"
+ *         description: Status of the orders
+ *     responses:
+ *       200:
+ *         description: List of orders
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 datas:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Order'
+ *       404:
+ *         description: Orders not found
+ */
 
+// Get Order By User
+/**
+ * @swagger
+ * /users/{id}/orders:
+ *   get:
+ *     summary: Get all orders for a specific user
+ *     tags: [Orders]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: User ID
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 5
+ *         description: Number of orders to return per page
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           default: "CANCELLED"
+ *         description: Status of the orders
+ *     responses:
+ *       200:
+ *         description: List of orders
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 datas:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Order'
+ *       404:
+ *         description: Orders not found
+ */
+
+/**
+ * @swagger
+ * /orders/users/{id}:
+ *   get:
+ *     summary: Get a specific order by ID
+ *     tags: [Orders]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Order ID
+ *     responses:
+ *       200:
+ *         description: An order object
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   $ref: '#/components/schemas/Order'
+ *       404:
+ *         description: Order not found
+ */
 /**
  * @swagger
  * /orders/{id}/cancel:
@@ -133,6 +261,46 @@ export  default  ordersRoutes;
  *                 message:
  *                   type: string
  *                   example: Order cancel!
+ *                 data:
+ *                   $ref: '#/components/schemas/Order'
+ *       404:
+ *         description: Order not found
+ */
+/**
+ * @swagger
+ * /orders/{id}/status:
+ *   patch:
+ *     summary: Update order status
+ *     tags: [Orders]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: Order ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *             example:
+ *               status: "ACCEPTED"
+ *     responses:
+ *       200:
+ *         description: Order status updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Order Status Update!
  *                 data:
  *                   $ref: '#/components/schemas/Order'
  *       404:

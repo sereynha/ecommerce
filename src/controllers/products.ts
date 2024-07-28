@@ -2,6 +2,7 @@ import { Request, Response} from "express";
 import {prismaClient} from "../index";
 import {NotFoundException} from "../expections/not-found";
 import {ErrorCode} from "../expections/root";
+import { Prisma } from '@prisma/client';
 
 export const createProduct = async (req:Request, res:Response) => {
     const product = await prismaClient.product.create({
@@ -95,5 +96,27 @@ export const deleteProduct = async (req:Request, res:Response) => {
         });
     } catch (error) {
         throw  new  NotFoundException('Product Not found!', ErrorCode.NOT_FOUND)
+    }
+}
+
+export const searchProducts = async (req: Request, res: Response) => {
+    const queryParam = req.query.params?.toString();
+    console.log(queryParam)
+    if (!queryParam) {
+        throw  new  NotFoundException( 'Query parameter is required', ErrorCode.NOT_FOUND)
+    }
+    try {
+        const products = await prismaClient.$queryRaw`
+            SELECT * FROM "products"
+            WHERE
+                "name" ILIKE ${`%${queryParam}%`}
+                OR "description" ILIKE ${`%${queryParam}%`}
+                OR "tags" ILIKE ${`%${queryParam}%`}
+        `;
+        res.status(200).json({
+            datas: products
+        });
+    } catch (error){
+        throw  new  NotFoundException('Search Product Not found!', ErrorCode.NOT_FOUND)
     }
 }

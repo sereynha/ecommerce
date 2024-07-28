@@ -60,7 +60,6 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
     })
 }
 
-
 export const getListOrders = async (req: Request, res: Response) => {
     const orders = await prismaClient.order.findMany({
         where: {
@@ -71,6 +70,7 @@ export const getListOrders = async (req: Request, res: Response) => {
         datas: orders
     });
 }
+
 export const getOneOrderById = async (req: Request, res: Response) => {
     try {
         const order = await prismaClient.order.findFirstOrThrow({
@@ -88,6 +88,51 @@ export const getOneOrderById = async (req: Request, res: Response) => {
     } catch(error) {
         throw new NotFoundException('Order not found!', ErrorCode.NOT_FOUND);
     }
+}
+export const getListAllOrdersByStatus = async (req: Request, res: Response) => {
+    let clauseData = {};
+    const status = req.query.status as string;
+    const page = parseInt(req.query.page as string) - 1;
+    const skip =  page || 0;
+    const take = parseInt(req.query.limit as string) || 5;
+    if(status) {
+        clauseData = {
+            status
+        }
+    }
+    console.log("Data :"+clauseData)
+    const orders = await prismaClient.order.findMany({
+        where: clauseData,
+        skip: skip,
+        take: take,
+    });
+    res.status(200).json({
+        datas: orders
+    });
+}
+
+export  const getListUserOrders = async (req: Request, res: Response) => {
+    const status = req.query.status
+    const page = parseInt(req.query.page as string) - 1;
+    const skip =  page || 0;
+    const take = parseInt(req.query.limit as string) || 5;
+    let clause: any = {
+        userId: +req.params.id
+    };
+    if(status) {
+        clause = {
+            ...clause,
+            status
+        }
+    }
+    const orders = await prismaClient.order.findMany({
+        where: clause,
+        skip: skip,
+        take: take
+    })
+    res.status(200).json({
+        datas: orders
+    });
 }
 
 export const cancelOrder = async (req: Request, res: Response) => {
@@ -108,6 +153,31 @@ export const cancelOrder = async (req: Request, res: Response) => {
         })
         res.status(200).json({
             message: 'Order cancel!',
+            data: order
+        });
+    } catch(error) {
+        throw new NotFoundException('Order not found!', ErrorCode.NOT_FOUND);
+    }
+}
+
+export const updateStatus = async (req: Request, res: Response) => {
+    try {
+        const order = await prismaClient.order.update({
+            where: {
+                id: +req.params.id
+            },
+            data: {
+                status: req.body.status
+            }
+        })
+        await prismaClient.orderEvent.create({
+            data: {
+                orderId: order.id,
+                status: order.status
+            }
+        })
+        res.status(200).json({
+            message: 'Order Status Update!',
             data: order
         });
     } catch(error) {
