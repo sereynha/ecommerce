@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import {NotFoundException} from "../expections/not-found";
 import {ErrorCode} from "../expections/root";
-import {prismaClient} from "../index";
+import {prismaClient} from "../config/prisma-client";
 import {UpdateUserSchema} from "../schema/users";
 import { Address} from '@prisma/client';
 

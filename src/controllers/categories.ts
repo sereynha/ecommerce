@@ -1,8 +1,8 @@
 import { Request, Response } from 'express'
-import {prismaClient} from "../index";
 import { BadRequestsException } from '../expections/bad-requests';
 import { ErrorCode } from '../expections/root';
 import { NotFoundException } from '../expections/not-found';
+import {prismaClient} from "../config/prisma-client";
 
 export const createCategories = async ( req: Request, res: Response) => {
     const { name } = req.body;

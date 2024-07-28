@@ -3,7 +3,7 @@ import {UnauthorizedException} from "../expections/unauthorized";
 import {ErrorCode} from "../expections/root";
 import  * as jwt from  'jsonwebtoken'
 import {JWT_SECRET_KEY} from "../utils/secret";
-import {prismaClient} from "../index";
+import {prismaClient} from "../config/prisma-client";
 import JwtPayloads from "../types";
 
 const authMiddleware = async  (req: Request, res: Response, next: NextFunction) => {

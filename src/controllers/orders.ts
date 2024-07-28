@@ -1,9 +1,9 @@
 import {NextFunction, Request, Response} from "express";
-import {prismaClient} from "../index";
 import { Decimal } from "@prisma/client/runtime/library";
 import {BadRequestsException} from "../expections/bad-requests";
 import {ErrorCode} from "../expections/root";
 import {NotFoundException} from "../expections/not-found";
+import {prismaClient} from "../config/prisma-client";
 
 export const createOrder = async (req: Request, res: Response, next: NextFunction) => {
     await prismaClient.$transaction(async(prisma) => {

@@ -1,11 +1,11 @@
 import {Request, Response} from 'express';
-import {prismaClient} from "../index";
 import  {hashSync, compareSync} from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import {JWT_EXPIRES_IN, JWT_SECRET_KEY} from "../utils/secret";
 import {BadRequestsException} from "../expections/bad-requests";
 import {ErrorCode} from "../expections/root";
 import {NotFoundException} from "../expections/not-found";
+import {prismaClient} from "../config/prisma-client";
 
 export  const signup = async  (req: Request,res: Response) => {
     const {email, password, name} = req.body;
