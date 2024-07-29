@@ -11,16 +11,17 @@ import {
     updateStatus
 } from "../controllers/orders";
 import adminMiddleware from "../middlewares/admin";
+import {cacheMiddleware, clearCacheMiddleware} from "../middlewares/cache";
 
 const ordersRoutes: Router = Router();
 
-ordersRoutes.post('/', [authMiddleware], errorHandler({method: createOrder}))
-ordersRoutes.get('/', [authMiddleware], errorHandler({method: getListOrders}))
-ordersRoutes.get('/:id', [authMiddleware], errorHandler({method: getOneOrderById}))
-ordersRoutes.get('/status/index', [authMiddleware, adminMiddleware], errorHandler({method: getListAllOrdersByStatus}))
-ordersRoutes.get('/users/:id', [authMiddleware, adminMiddleware], errorHandler({method: getListUserOrders}))
-ordersRoutes.patch('/:id/cancel', [authMiddleware], errorHandler({method: cancelOrder}))
-ordersRoutes.patch('/:id/status', [authMiddleware, adminMiddleware], errorHandler({method: updateStatus}))
+ordersRoutes.post('/', [authMiddleware, clearCacheMiddleware], errorHandler({method: createOrder}))
+ordersRoutes.get('/', [authMiddleware, cacheMiddleware], errorHandler({method: getListOrders}))
+ordersRoutes.get('/:id', [authMiddleware, cacheMiddleware], errorHandler({method: getOneOrderById}))
+ordersRoutes.get('/status/index', [authMiddleware, adminMiddleware, cacheMiddleware], errorHandler({method: getListAllOrdersByStatus}))
+ordersRoutes.get('/users/:id', [authMiddleware, adminMiddleware, cacheMiddleware], errorHandler({method: getListUserOrders}))
+ordersRoutes.patch('/:id/cancel', [authMiddleware, clearCacheMiddleware], errorHandler({method: cancelOrder}))
+ordersRoutes.patch('/:id/status', [authMiddleware, adminMiddleware, clearCacheMiddleware], errorHandler({method: updateStatus}))
 
 export  default  ordersRoutes;
 

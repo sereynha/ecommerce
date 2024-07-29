@@ -14,19 +14,20 @@ import {
     updateUser
 } from "../controllers/users";
 import {CreateAddressSchema, UpdateUserSchema} from "../schema/users";
+import {cacheMiddleware, clearCacheMiddleware} from "../middlewares/cache";
 
 
 const userRoutes: Router = Router();
 
-userRoutes.post('/addresses',[authMiddleware],errorHandler({method: createAddress, schema: CreateAddressSchema}));
-userRoutes.get('/addresses',[authMiddleware],errorHandler({method: getListAddressByUser}));
-userRoutes.patch('/addresses/:id',[authMiddleware],errorHandler({method: updateAddress}));
-userRoutes.delete('/addresses/:id',[authMiddleware],errorHandler({method: deleteAddress}));
-userRoutes.put('/',[authMiddleware],errorHandler({method: updateUser, schema: UpdateUserSchema}));
-userRoutes.get('/',[authMiddleware,adminMiddleware],errorHandler({method: getListUsers}));
-userRoutes.put('/:id/role',[authMiddleware,adminMiddleware],errorHandler({method: changeUserRole}));
-userRoutes.get('/:id',[authMiddleware,adminMiddleware],errorHandler({method: getUserById}));
-userRoutes.get('/:id/orders',[authMiddleware,adminMiddleware],errorHandler({method: getUserByIdViewOrders}));
+userRoutes.post('/addresses',[authMiddleware, clearCacheMiddleware],errorHandler({method: createAddress, schema: CreateAddressSchema}));
+userRoutes.get('/addresses',[authMiddleware, cacheMiddleware],errorHandler({method: getListAddressByUser}));
+userRoutes.patch('/addresses/:id',[authMiddleware,clearCacheMiddleware],errorHandler({method: updateAddress}));
+userRoutes.delete('/addresses/:id',[authMiddleware,clearCacheMiddleware],errorHandler({method: deleteAddress}));
+userRoutes.put('/',[authMiddleware,clearCacheMiddleware],errorHandler({method: updateUser, schema: UpdateUserSchema}));
+userRoutes.get('/',[authMiddleware,adminMiddleware,cacheMiddleware],errorHandler({method: getListUsers}));
+userRoutes.put('/:id/role',[authMiddleware,adminMiddleware,clearCacheMiddleware],errorHandler({method: changeUserRole}));
+userRoutes.get('/:id',[authMiddleware,adminMiddleware,cacheMiddleware],errorHandler({method: getUserById}));
+userRoutes.get('/:id/orders',[authMiddleware,adminMiddleware,cacheMiddleware],errorHandler({method: getUserByIdViewOrders}));
 
 export default  userRoutes;
 

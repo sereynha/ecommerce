@@ -8,3 +8,8 @@ declare global {
       }
     }
   }
+declare module 'express-serve-static-core' {
+    interface Response {
+        sendResponse?: (body?: any) => this;
+    }
+}

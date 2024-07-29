@@ -12,16 +12,17 @@ import authMiddleware from "../middlewares/auth";
 import {CreateProductShema, UpdateProductShema} from "../schema/products";
 import adminMiddleware from "../middlewares/admin";
 import { errorHandler } from "../middlewares/error-handler";
+import {cacheMiddleware, clearCacheMiddleware} from "../middlewares/cache";
 
 const productsRoutes: Router = Router();
 
-productsRoutes.post('/', [ authMiddleware, adminMiddleware], errorHandler({method: createProduct, schema: CreateProductShema}));
-productsRoutes.get('/', [ authMiddleware], errorHandler({method: getListProduct}));
-productsRoutes.get('/:id', [ authMiddleware], errorHandler({method: getOneProduct}));
-productsRoutes.get('/categories/:id', [ authMiddleware], errorHandler({method: getProductByCategories}));
-productsRoutes.get('/search/text', [authMiddleware], errorHandler({method: searchProducts}))
-productsRoutes.patch('/:id', [ authMiddleware, adminMiddleware], errorHandler({method: updateProduct, schema: UpdateProductShema}));
-productsRoutes.delete('/:id', [ authMiddleware, adminMiddleware], errorHandler({method: deleteProduct}));
+productsRoutes.post('/', [ authMiddleware, adminMiddleware, clearCacheMiddleware], errorHandler({method: createProduct, schema: CreateProductShema}));
+productsRoutes.get('/', [ authMiddleware, cacheMiddleware], errorHandler({method: getListProduct}));
+productsRoutes.get('/:id', [ authMiddleware, cacheMiddleware], errorHandler({method: getOneProduct}));
+productsRoutes.get('/categories/:id', [ authMiddleware, cacheMiddleware], errorHandler({method: getProductByCategories}));
+productsRoutes.get('/search/text', [authMiddleware, cacheMiddleware], errorHandler({method: searchProducts}))
+productsRoutes.patch('/:id', [ authMiddleware, adminMiddleware, clearCacheMiddleware], errorHandler({method: updateProduct, schema: UpdateProductShema}));
+productsRoutes.delete('/:id', [ authMiddleware, adminMiddleware, clearCacheMiddleware], errorHandler({method: deleteProduct}));
 
 export  default productsRoutes;
 
