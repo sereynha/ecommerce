@@ -2,24 +2,39 @@ import { Router } from "express";
 import authMiddleware from "../middlewares/auth";
 import adminMiddleware from "../middlewares/admin";
 import {errorHandler} from "../middlewares/error-handler";
-import {createAddress, deleteAddress, getListAddressByUser, updateAddress, updateUser} from "../controllers/users";
+import {
+    changeUserRole,
+    createAddress,
+    deleteAddress,
+    getListAddressByUser,
+    getListUsers,
+    getUserById,
+    getUserByIdViewOrders,
+    updateAddress,
+    updateUser
+} from "../controllers/users";
 import {CreateAddressSchema, UpdateUserSchema} from "../schema/users";
+import {cacheMiddleware, clearCacheMiddleware} from "../middlewares/cache";
 
 
 const userRoutes: Router = Router();
 
-userRoutes.post('/',[authMiddleware],errorHandler({method: createAddress, schema: CreateAddressSchema}));
-userRoutes.get('/user',[authMiddleware],errorHandler({method: getListAddressByUser}));
-userRoutes.patch('/:id',[authMiddleware],errorHandler({method: updateAddress}));
-userRoutes.delete('/:id',[authMiddleware],errorHandler({method: deleteAddress}));
-userRoutes.put('/user',[authMiddleware],errorHandler({method: updateUser, schema: UpdateUserSchema}));
+userRoutes.post('/addresses',[authMiddleware, clearCacheMiddleware],errorHandler({method: createAddress, schema: CreateAddressSchema}));
+userRoutes.get('/addresses',[authMiddleware, cacheMiddleware],errorHandler({method: getListAddressByUser}));
+userRoutes.patch('/addresses/:id',[authMiddleware,clearCacheMiddleware],errorHandler({method: updateAddress}));
+userRoutes.delete('/addresses/:id',[authMiddleware,clearCacheMiddleware],errorHandler({method: deleteAddress}));
+userRoutes.put('/',[authMiddleware,clearCacheMiddleware],errorHandler({method: updateUser, schema: UpdateUserSchema}));
+userRoutes.get('/',[authMiddleware,adminMiddleware,cacheMiddleware],errorHandler({method: getListUsers}));
+userRoutes.put('/:id/role',[authMiddleware,adminMiddleware,clearCacheMiddleware],errorHandler({method: changeUserRole}));
+userRoutes.get('/:id',[authMiddleware,adminMiddleware,cacheMiddleware],errorHandler({method: getUserById}));
+userRoutes.get('/:id/orders',[authMiddleware,adminMiddleware,cacheMiddleware],errorHandler({method: getUserByIdViewOrders}));
 
 export default  userRoutes;
 
 /**
  * @swagger
  * tags:
- *   - name: Users
+ *   - name: User
  *     description: User management
  *   - name: Addresses
  *     description: Address management
@@ -28,7 +43,7 @@ export default  userRoutes;
 // Create Address
 /**
  * @swagger
- * /addresses:
+ * /users/addresses:
  *   post:
  *     summary: Create a new address
  *     tags: [Addresses]
@@ -77,7 +92,7 @@ export default  userRoutes;
 // Get Addresses by User
 /**
  * @swagger
- * /addresses/user:
+ * /users/addresses:
  *   get:
  *     summary: Get the list of addresses for the authenticated user
  *     tags: [Addresses]
@@ -95,7 +110,7 @@ export default  userRoutes;
 // Update Address
 /**
  * @swagger
- * /addresses/{id}:
+ * /users/addresses/{id}:
  *   patch:
  *     summary: Update an existing address
  *     tags: [Addresses]
@@ -144,11 +159,10 @@ export default  userRoutes;
  *         $ref: '#/components/responses/NotFoundException'
  */
 
-
 // Delete Address
 /**
  * @swagger
- * /addresses/{id}:
+ * /users/addresses/{id}:
  *   delete:
  *     summary: Delete an address by id
  *     tags: [Addresses]
@@ -177,10 +191,10 @@ export default  userRoutes;
 // Update User
 /**
  * @swagger
- * /addresses/user:
+ * /users:
  *   put:
  *     summary: Update user information
- *     tags: [Users]
+ *     tags: [User]
  *     requestBody:
  *       required: true
  *       content:
@@ -198,6 +212,147 @@ export default  userRoutes;
  *               name: "Meng"
  *               defaultShippingAddress: 1
  *               defaultBillingAddress: 2
+ *     responses:
+ *       "200":
+ *         description: Update successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Update successful"
+ *                 data:
+ *                   $ref: '#/components/schemas/User'
+ *       "404":
+ *         $ref: '#/components/responses/NotFoundException'
+ */
+
+// Get List of Users
+/**
+ * @swagger
+ * /users:
+ *   get:
+ *     summary: Get list of users
+ *     tags: [User]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 5
+ *         description: Number of users per page
+ *     responses:
+ *       "200":
+ *         description: Update successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Update successful"
+ *                 data:
+ *                   $ref: '#/components/schemas/User'
+ *       "404":
+ *         $ref: '#/components/responses/NotFoundException'
+ */
+
+// Update Role
+/**
+ * @swagger
+ * /users/{id}/role:
+ *   put:
+ *     summary: Change user role
+ *     tags: [User]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: User ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               role:
+ *                 type: string
+ *             example:
+ *               role: "ADMIN"
+ *     responses:
+ *       "200":
+ *         description: Update successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Update successful"
+ *                 data:
+ *                   $ref: '#/components/schemas/User'
+ *       "404":
+ *         $ref: '#/components/responses/NotFoundException'
+ */
+
+// Get User By Id
+/**
+ * @swagger
+ * /users/{id}:
+ *   get:
+ *     summary: Get user by ID
+ *     tags: [User]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: User ID
+ *     responses:
+ *       "200":
+ *         description: Update successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Update successful"
+ *                 data:
+ *                   $ref: '#/components/schemas/User'
+ *       "404":
+ *         $ref: '#/components/responses/NotFoundException'
+ */
+
+// Get User By Id View Orders
+/**
+ * @swagger
+ * /users/{id}/orders:
+ *   get:
+ *     summary: Get user by ID with orders
+ *     tags: [User]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: User ID
  *     responses:
  *       "200":
  *         description: Update successful

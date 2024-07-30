@@ -5,3 +5,4 @@ pg_data
 .env
 .idea/
 .DS_Store
+dist

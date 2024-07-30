@@ -5,21 +5,24 @@ import {
     getListProduct,
     getOneProduct,
     getProductByCategories,
+    searchProducts,
     updateProduct
 } from "../controllers/products";
 import authMiddleware from "../middlewares/auth";
 import {CreateProductShema, UpdateProductShema} from "../schema/products";
 import adminMiddleware from "../middlewares/admin";
 import { errorHandler } from "../middlewares/error-handler";
+import {cacheMiddleware, clearCacheMiddleware} from "../middlewares/cache";
 
 const productsRoutes: Router = Router();
 
-productsRoutes.post('/', [ authMiddleware, adminMiddleware], errorHandler({method: createProduct, schema: CreateProductShema}));
-productsRoutes.get('/', [ authMiddleware], errorHandler({method: getListProduct}));
-productsRoutes.get('/:id', [ authMiddleware], errorHandler({method: getOneProduct}));
-productsRoutes.patch('/:id', [ authMiddleware, adminMiddleware], errorHandler({method: updateProduct, schema: UpdateProductShema}));
-productsRoutes.delete('/:id', [ authMiddleware, adminMiddleware], errorHandler({method: deleteProduct}));
-productsRoutes.get('/categories/:id', [ authMiddleware], errorHandler({method: getProductByCategories}));
+productsRoutes.post('/', [ authMiddleware, adminMiddleware, clearCacheMiddleware], errorHandler({method: createProduct, schema: CreateProductShema}));
+productsRoutes.get('/', [ authMiddleware, cacheMiddleware], errorHandler({method: getListProduct}));
+productsRoutes.get('/:id', [ authMiddleware, cacheMiddleware], errorHandler({method: getOneProduct}));
+productsRoutes.get('/categories/:id', [ authMiddleware, cacheMiddleware], errorHandler({method: getProductByCategories}));
+productsRoutes.get('/search/text', [authMiddleware, cacheMiddleware], errorHandler({method: searchProducts}))
+productsRoutes.patch('/:id', [ authMiddleware, adminMiddleware, clearCacheMiddleware], errorHandler({method: updateProduct, schema: UpdateProductShema}));
+productsRoutes.delete('/:id', [ authMiddleware, adminMiddleware, clearCacheMiddleware], errorHandler({method: deleteProduct}));
 
 export  default productsRoutes;
 
@@ -143,6 +146,63 @@ export  default productsRoutes;
  *                 $ref: '#/components/schemas/Product'
  */
 
+// Get Products by Category
+/**
+ * @swagger
+ * /products/categories/{id}:
+ *   get:
+ *     summary: Get products by category id
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The category id
+ *     responses:
+ *       "200":
+ *         description: List of products in the category
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Product'
+ *       "404":
+ *         $ref: '#/components/responses/ProductNotFound'
+ */
+
+// Search Product
+/**
+ * @swagger
+ * /products/search/text:
+ *   get:
+ *     summary: Search for products
+ *     description: Search for products by name, description, or tags
+ *     tags: [Products]
+ *     parameters:
+ *       - in: query
+ *         name: params
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The search parameter
+ *     responses:
+ *       200:
+ *         description: A list of products
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 datas:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Product'
+ *       404:
+ *         description: Products not found
+ */
 
 // Update Product
 /**
@@ -227,33 +287,6 @@ export  default productsRoutes;
  *                 message:
  *                   type: string
  *                   example: "Delete successful"
- *       "404":
- *         $ref: '#/components/responses/ProductNotFound'
- */
-
-// Get Products by Category
-/**
- * @swagger
- * /products/categories/{id}:
- *   get:
- *     summary: Get products by category id
- *     tags: [Products]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: integer
- *         required: true
- *         description: The category id
- *     responses:
- *       "200":
- *         description: List of products in the category
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Product'
  *       "404":
  *         $ref: '#/components/responses/ProductNotFound'
  */

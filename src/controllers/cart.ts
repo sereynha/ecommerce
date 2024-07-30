@@ -2,7 +2,7 @@ import { NextFunction , Request , Response} from "express";
 import { ErrorCode } from "../expections/root";
 import { NotFoundException } from "../expections/not-found";
 import { Product,CartItem } from '@prisma/client';
-import {prismaClient} from "../index";
+import {prismaClient} from "../config/prisma-client";
 
 export const createItemToCart = async (req:Request, res:Response) => {
     const validated = req.body;

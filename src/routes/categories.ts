@@ -4,14 +4,15 @@ import {errorHandler} from "../middlewares/error-handler";
 import {createCategories, deleteCategories, getListCategories, getOneCategories} from "../controllers/categories";
 import {CreateCategoriesShema} from "../schema/categories";
 import adminMiddleware from "../middlewares/admin";
+import {cacheMiddleware, clearCacheMiddleware} from "../middlewares/cache";
 
 
 const categoriesRoutes: Router = Router();
 
-categoriesRoutes.post('/', [authMiddleware, adminMiddleware], errorHandler({method: createCategories, schema: CreateCategoriesShema}));
-categoriesRoutes.get('/', [authMiddleware], errorHandler({ method: getListCategories}));
-categoriesRoutes.get('/:id', [authMiddleware], errorHandler({ method: getOneCategories}));
-categoriesRoutes.delete('/:id', [authMiddleware, adminMiddleware], errorHandler({ method: deleteCategories}));
+categoriesRoutes.post('/', [authMiddleware, adminMiddleware, clearCacheMiddleware], errorHandler({method: createCategories, schema: CreateCategoriesShema}));
+categoriesRoutes.get('/', [authMiddleware, cacheMiddleware], errorHandler({ method: getListCategories}));
+categoriesRoutes.get('/:id', [authMiddleware, cacheMiddleware], errorHandler({ method: getOneCategories}));
+categoriesRoutes.delete('/:id', [authMiddleware, adminMiddleware, clearCacheMiddleware], errorHandler({ method: deleteCategories}));
 
 export default categoriesRoutes;
 
