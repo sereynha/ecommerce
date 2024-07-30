@@ -13,6 +13,7 @@
 - Authentication using [JWT](https://jwt.io/)
 - Swagger UI [Swagger-Express](https://github.com/scottie1984/swagger-ui-express) and Swagger Jsdoc [Swagger-Jsdoc](https://github.com/Surnet/swagger-jsdoc)
 - Automatic Restart using [nodemon](https://github.com/remy/nodemon)
+- Query Caching using [Redis](https://redis.io/).
 - Hashing Passwords using [bcrypt](https://www.npmjs.com/package/bcrypt).
 - Unit Testing examples using [Jest](https://jestjs.io/). See `src/__tests__`.
 
